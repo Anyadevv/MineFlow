@@ -1,0 +1,49 @@
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(-0.5deg);
+  }
+
+  50% {
+    transform: translateY(-18px) rotate(1.5deg);
+  }
+
+  100% {
+    transform: translateY(0) rotate(-0.5deg);
+  }
+}
+
+@keyframes breathe {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 15px 25px rgba(16, 185, 129, 0.2)) brightness(1);
+  }
+
+  50% {
+    filter: drop-shadow(0 35px 55px rgba(16, 185, 129, 0.4)) brightness(1.08);
+  }
+}
+
+/* Floor shadow that scales inversely with float animation */
+@keyframes shadow-pulse {
+
+  0%,
+  100% {
+    transform: scale(1) translateX(-50%);
+    opacity: 0.3;
+  }
+
+  50% {
+    transform: scale(0.85) translateX(-50%);
+    opacity: 0.15;
+  }
+}
+
+.animate-miner-float {
+  animation: float 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite,
+    breathe 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.miner-floor-shadow {
+  animation: shadow-pulse 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}

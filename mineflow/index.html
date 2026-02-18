@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MineFlow - Crypto Mining Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              emerald: {
+                50: '#ecfdf5',
+                100: '#d1fae5',
+                200: '#a7f3d0',
+                300: '#6ee7b7',
+                400: '#34d399',
+                500: '#10b981',
+                600: '#059669',
+                700: '#047857',
+                800: '#065f46',
+                900: '#064e3b',
+              },
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+      }
+
+      /* 3D Cube Styles */
+      .cube-scene {
+        width: 300px;
+        height: 300px;
+        perspective: 1200px;
+      }
+      
+      .cube {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        animation: rotateCube 20s infinite linear;
+      }
+      
+      .cube-face {
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border: 2px solid #10b981;
+        background: rgba(16, 185, 129, 0.02);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.3) inset, 0 0 5px rgba(16, 185, 129, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backface-visibility: visible;
+      }
+      
+      .cube-face.front  { transform: rotateY(  0deg) translateZ(150px); }
+      .cube-face.back   { transform: rotateY(180deg) translateZ(150px); }
+      .cube-face.right  { transform: rotateY( 90deg) translateZ(150px); }
+      .cube-face.left   { transform: rotateY(-90deg) translateZ(150px); }
+      .cube-face.top    { transform: rotateX( 90deg) translateZ(150px); }
+      .cube-face.bottom { transform: rotateX(-90deg) translateZ(150px); }
+      
+      .inner-cube {
+        width: 150px;
+        height: 150px;
+        position: absolute;
+        top: 75px;
+        left: 75px;
+        transform-style: preserve-3d;
+        animation: rotateCube 15s infinite linear reverse;
+      }
+      
+      .inner-face {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        border: 2px solid #34d399;
+        background: rgba(52, 211, 153, 0.1);
+        box-shadow: 0 0 10px rgba(52, 211, 153, 0.4);
+      }
+      
+      .inner-face.front  { transform: rotateY(  0deg) translateZ(75px); }
+      .inner-face.back   { transform: rotateY(180deg) translateZ(75px); }
+      .inner-face.right  { transform: rotateY( 90deg) translateZ(75px); }
+      .inner-face.left   { transform: rotateY(-90deg) translateZ(75px); }
+      .inner-face.top    { transform: rotateX( 90deg) translateZ(75px); }
+      .inner-face.bottom { transform: rotateX(-90deg) translateZ(75px); }
+
+      .grid-lines {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+          linear-gradient(rgba(16, 185, 129, 0.15) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(16, 185, 129, 0.15) 1px, transparent 1px);
+        background-size: 50px 50px;
+        z-index: -1;
+      }
+
+      @keyframes rotateCube {
+        0% { transform: rotateX(0deg) rotateY(0deg); }
+        100% { transform: rotateX(360deg) rotateY(360deg); }
+      }
+      
+      @keyframes float-visual {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+      }
+
+      /* Premium Soft Pulse for Button */
+      @keyframes soft-pulse {
+        0%, 100% { 
+          transform: scale(1); 
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        50% { 
+          transform: scale(1.03); 
+          box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.4); 
+        }
+      }
+      
+      .animate-soft-pulse {
+        animation: soft-pulse 3s infinite ease-in-out;
+      }
+
+      /* Premium Card Glow Breath */
+      @keyframes card-breath {
+        0%, 100% { 
+          box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.25); 
+        }
+        50% { 
+          box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.6), 0 0 35px rgba(16, 185, 129, 0.5); 
+        }
+      }
+      
+      .animate-premium-glow {
+        animation: card-breath 3s infinite ease-in-out;
+      }
+
+      /* Table Row Animation */
+      @keyframes slideDown {
+        0% { opacity: 0; transform: translateY(-20px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      
+      .animate-slide-down {
+        animation: slideDown 0.5s ease-out forwards;
+      }
+
+      .text-shadow-emerald {
+        text-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
+      }
+      
+      .text-shadow-amber {
+        text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-emerald-50 text-slate-800 antialiased">
+    <div id="root"></div>
+  <script type="module" src="/src/index.tsx"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+@layer utilities {
+  @keyframes badge-shimmer {
+    0% { transform: translateX(-150%) skewX(-20deg); }
+    30% { transform: translateX(150%) skewX(-20deg); }
+    100% { transform: translateX(150%) skewX(-20deg); }
+  }
+
+  @keyframes badge-pulse {
+    0%, 100% { 
+      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3), 
+                  0 0 15px rgba(16, 185, 129, 0.2),
+                  inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    }
+    50% { 
+      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.5), 
+                  0 0 25px rgba(16, 185, 129, 0.4),
+                  inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  @keyframes badge-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+  }
+
+  .animate-badge-shimmer {
+    animation: badge-shimmer 4s infinite linear;
+    width: 200%; 
+  }
+
+  .animate-badge-pulse {
+    animation: badge-pulse 4s infinite ease-in-out;
+  }
+
+  .animate-badge-float {
+    animation: badge-float 3s infinite ease-in-out;
+  }
+}
