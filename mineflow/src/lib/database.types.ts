@@ -513,6 +513,12 @@ export type Database = {
         }
         Returns: Json
       }
+      get_valid_referrals_count: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: number
+      }
       calculate_plan_roi: {
         Args: {
           p_amount: number

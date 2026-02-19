@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Bitcoin, Hexagon, Zap, ArrowUpRight, Loader2, AlertCircle, CheckCircle2, Wallet as WalletIcon } from 'lucide-react';
+import { X, Bitcoin, Hexagon, Zap, ArrowUpRight, Loader2, AlertCircle, CheckCircle2, Wallet as WalletIcon, Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
@@ -58,8 +58,40 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ isOpen, onClose, o
         }
     };
 
+    // Referral check state
+    const [referralCount, setReferralCount] = useState<number | null>(null);
+    const [fetchingReferrals, setFetchingReferrals] = useState(false);
+    const [referralBlockParams, setReferralBlockParams] = useState<{ blocked: boolean, count: number }>({ blocked: false, count: 0 });
+
+    useEffect(() => {
+        if (isOpen && user) {
+            fetchReferralCount();
+        }
+    }, [isOpen, user]);
+
+    const fetchReferralCount = async () => {
+        setFetchingReferrals(true);
+        try {
+            const { data, error } = await supabase.rpc('get_valid_referrals_count', {
+                p_user_id: user?.id
+            });
+            if (error) throw error;
+            setReferralCount(data);
+        } catch (err) {
+            console.error('Error fetching referrals:', err);
+        } finally {
+            setFetchingReferrals(false);
+        }
+    };
+
     const handleWithdraw = async () => {
         if (!user || !profile || !selectedNetwork || !savedWallet) return;
+
+        // Valid Referral Check
+        if (referralCount !== null && referralCount < 3) {
+            setReferralBlockParams({ blocked: true, count: referralCount });
+            return;
+        }
 
         const withdrawAmount = parseFloat(amount);
         if (isNaN(withdrawAmount) || withdrawAmount < 5) {
@@ -143,6 +175,37 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ isOpen, onClose, o
                                 <X className="text-slate-400" />
                             </button>
                         </div>
+
+                        {/* Referral Block Popup Overlay */}
+                        {referralBlockParams.blocked && (
+                            <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center p-8 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center animate-bounce mb-6">
+                                    <Users size={48} />
+                                </div>
+                                <h3 className="text-2xl font-black text-slate-800 uppercase text-center mb-4">Action Required</h3>
+                                <p className="text-slate-500 font-bold text-center max-w-sm mb-8">
+                                    To unlock withdrawals, you need at least <span className="text-slate-900">3 referrals</span> with active deposits.
+                                </p>
+                                <div className="bg-slate-50 rounded-2xl p-6 w-full max-w-xs mb-8 border border-slate-100">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Progress</span>
+                                        <span className="text-xs font-black text-slate-800 uppercase tracking-widest">{referralBlockParams.count} / 3</span>
+                                    </div>
+                                    <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-red-500 transition-all duration-1000"
+                                            style={{ width: `${Math.min((referralBlockParams.count / 3) * 100, 100)}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setReferralBlockParams({ blocked: false, count: 0 })}
+                                    className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 active:scale-95"
+                                >
+                                    Understood
+                                </button>
+                            </div>
+                        )}
 
                         <div className="p-8 space-y-6">
                             {/* Network Selection */}

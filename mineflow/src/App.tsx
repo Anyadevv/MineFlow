@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { PlanCard } from './components/PlanCard';
@@ -12,14 +12,16 @@ import {
 } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './LanguageContext';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
-import { AuthPage } from './pages/AuthPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { useAuth } from './context/AuthContext';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { WalletSettingsPage } from './pages/WalletSettingsPage';
 import { supabase } from './lib/supabase';
 import './miner-animations.css';
+
+// Lazy load heavy components
+const AuthPage = React.lazy(() => import('./pages/AuthPage').then(module => ({ default: module.AuthPage })));
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage').then(module => ({ default: module.DashboardPage })));
+const AdminDashboardPage = React.lazy(() => import('./pages/AdminDashboardPage').then(module => ({ default: module.AdminDashboardPage })));
+const WalletSettingsPage = React.lazy(() => import('./pages/WalletSettingsPage').then(module => ({ default: module.WalletSettingsPage })));
 
 // --- Page Components ---
 
@@ -262,6 +264,7 @@ const HomePage = () => {
                 src="/crypto_mining_rigs_v2_dark_1768871482557.png"
                 alt="Mining Infrastructure"
                 className="rounded-2xl shadow-2xl border border-slate-700 opacity-90 hover:opacity-100 transition-opacity"
+                loading="lazy"
               />
               <div className="absolute -bottom-6 -left-6 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
                 <div className="flex items-center gap-4">
@@ -641,8 +644,8 @@ const App = () => {
   };
 
   const isAdmin = user && (
-    user.email === 'kenagostinhops@gmail.com' || 
-    profile?.role?.toLowerCase() === 'admin' || 
+    user.email === 'kenagostinhops@gmail.com' ||
+    profile?.role?.toLowerCase() === 'admin' ||
     profile?.role?.toLowerCase() === 'adm'
   );
 
@@ -657,37 +660,39 @@ const App = () => {
       />
 
       <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/plans" element={<PlansPage />} />
-          <Route path="/bounty" element={<BountyPage />} />
-          <Route path="/live-payouts" element={<StatsPage />} />
-          <Route path="/help" element={<HelpPage />} />
-          <Route path="/support" element={<ContactPage />} />
-          
-          <Route path="/login" element={
-            user ? (
-              getRedirectPath() ? <Navigate to={getRedirectPath()!} /> : <FullPageLoader />
-            ) : (
-              <AuthPage type="login" onLogin={() => {
-                // The Navigate inside the Route will handle it once user/profile updates
-              }} />
-            )
-          } />
-          
-          <Route path="/register" element={
-            user ? (
-              getRedirectPath() ? <Navigate to={getRedirectPath()!} /> : <FullPageLoader />
-            ) : (
-              <AuthPage type="register" onLogin={() => {}} />
-            )
-          } />
+        <Suspense fallback={<FullPageLoader />}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/plans" element={<PlansPage />} />
+            <Route path="/bounty" element={<BountyPage />} />
+            <Route path="/live-payouts" element={<StatsPage />} />
+            <Route path="/help" element={<HelpPage />} />
+            <Route path="/support" element={<ContactPage />} />
 
-          <Route path="/dashboard" element={user ? <DashboardPage onNavigate={navigate} /> : <Navigate to="/login" />} />
-          <Route path="/admin/*" element={isAdmin ? <AdminDashboardPage /> : (profile ? <Navigate to="/dashboard" /> : <FullPageLoader />)} />
-          <Route path="/wallet-settings" element={user ? <WalletSettingsPage /> : <Navigate to="/login" />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+            <Route path="/login" element={
+              user ? (
+                getRedirectPath() ? <Navigate to={getRedirectPath()!} /> : <FullPageLoader />
+              ) : (
+                <AuthPage type="login" onLogin={() => {
+                  // The Navigate inside the Route will handle it once user/profile updates
+                }} />
+              )
+            } />
+
+            <Route path="/register" element={
+              user ? (
+                getRedirectPath() ? <Navigate to={getRedirectPath()!} /> : <FullPageLoader />
+              ) : (
+                <AuthPage type="register" onLogin={() => { }} />
+              )
+            } />
+
+            <Route path="/dashboard" element={user ? <DashboardPage onNavigate={navigate} /> : <Navigate to="/login" />} />
+            <Route path="/admin/*" element={isAdmin ? <AdminDashboardPage /> : (profile ? <Navigate to="/dashboard" /> : <FullPageLoader />)} />
+            <Route path="/wallet-settings" element={user ? <WalletSettingsPage /> : <Navigate to="/login" />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Suspense>
       </main>
 
       <Footer onNavigate={navigate} />
