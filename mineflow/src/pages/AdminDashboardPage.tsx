@@ -314,7 +314,7 @@ export const AdminDashboardPage = () => {
             )}
 
             {/* Sidebar */}
-            <aside className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-72 bg-white/80 backdrop-blur-xl border-r border-slate-200 flex flex-col transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+            <aside className={`fixed h-screen w-full sm:w-72 bg-white/80 backdrop-blur-xl border-r border-slate-200 flex flex-col z-[60] transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:sticky lg:top-0'}`}>
                 <div className="p-8 flex items-center gap-4">
                     <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-emerald-500/20 shadow-lg">
                         <Shield size={20} />
@@ -332,7 +332,7 @@ export const AdminDashboardPage = () => {
                             to={item.path}
                             onClick={() => setSidebarOpen(false)}
                             className={({ isActive }) => `
-                                flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-bold text-sm group
+                                flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-bold text-base sm:text-sm group
                                 ${isActive
                                     ? 'bg-emerald-50 text-emerald-600 shadow-sm'
                                     : 'text-slate-500 hover:bg-white hover:text-slate-800 hover:shadow-lg hover:shadow-slate-100'}
@@ -386,7 +386,7 @@ export const AdminDashboardPage = () => {
                     </div>
                 </header>
 
-                <div className="flex-1 overflow-y-auto p-8 lg:p-12 scroll-smooth">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-12 scroll-smooth">
                     <div className="max-w-7xl mx-auto space-y-12 pb-20">
                         <Routes>
                             <Route path="/" element={<Navigate to="dashboard" replace />} />

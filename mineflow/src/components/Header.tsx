@@ -112,30 +112,32 @@ export const Header: React.FC<HeaderProps> = ({ isAuthenticated, onLogout, user,
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-slate-100 animate-in slide-in-from-top-2">
-          <div className="px-4 py-4 space-y-2">
+        <div className="md:hidden fixed inset-0 top-20 z-50 bg-white animate-in slide-in-from-top-2 overflow-y-auto">
+          <div className="px-6 py-8 space-y-4">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium ${location.pathname === item.id ? 'bg-emerald-50 text-emerald-600' : 'text-slate-600 hover:bg-slate-50'
-                  }`}
+                className={`block w-full text-left px-6 py-4 rounded-2xl text-lg font-bold transition-all ${location.pathname === item.id 
+                  ? 'bg-emerald-50 text-emerald-600' 
+                  : 'text-slate-600 hover:bg-slate-50'
+                }`}
               >
                 {item.label}
               </button>
             ))}
-            <div className="border-t border-slate-100 my-2 pt-2 space-y-2">
+            <div className="border-t border-slate-100 my-6 pt-6 space-y-4">
               {isAuthenticated ? (
                 <>
                   <button
                     onClick={() => handleNavClick('/dashboard')}
-                    className="block w-full text-center px-4 py-3 rounded-lg text-base font-black bg-[#f0fdf4] text-[#10b981] border border-[#10b981]/20"
+                    className="block w-full text-center px-6 py-4 rounded-2xl text-lg font-black bg-emerald-50 text-emerald-600 border border-emerald-500/20 shadow-sm"
                   >
                     My Earnings
                   </button>
                   <button
                     onClick={onLogout}
-                    className="block w-full text-center px-4 py-3 rounded-lg text-base font-bold text-slate-400 uppercase tracking-widest"
+                    className="block w-full text-center px-6 py-4 rounded-2xl text-lg font-bold text-slate-400 uppercase tracking-widest"
                   >
                     Log Out
                   </button>
@@ -144,13 +146,13 @@ export const Header: React.FC<HeaderProps> = ({ isAuthenticated, onLogout, user,
                 <>
                   <button
                     onClick={() => handleNavClick('/login')}
-                    className="block w-full text-center px-4 py-3 rounded-lg text-base font-bold text-slate-500 border border-slate-100"
+                    className="block w-full text-center px-6 py-4 rounded-2xl text-lg font-bold text-slate-500 border border-slate-100"
                   >
                     Sign In
                   </button>
                   <button
                     onClick={() => handleNavClick('/register')}
-                    className="block w-full text-center px-4 py-3 rounded-lg text-base font-black bg-[#10b981] text-white shadow-md"
+                    className="block w-full text-center px-6 py-4 rounded-2xl text-lg font-black bg-[#10b981] text-white shadow-lg shadow-emerald-500/20"
                   >
                     Get Started
                   </button>

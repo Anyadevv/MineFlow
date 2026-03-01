@@ -84,45 +84,45 @@ const HomePage = () => {
               <span className="text-sm font-medium text-slate-600">Trusted by 5,000+ investors</span>
             </div>
 
-            <h1 className="text-5xl lg:text-7xl font-extrabold text-slate-900 tracking-tight leading-110%">
-              {t('hero.title_start')} <br />
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-slate-900 tracking-tight leading-[1.1]">
+              {t('hero.title_start')} <br className="hidden sm:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-400">
                 {t('hero.title_end')}
               </span>
             </h1>
-            <p className="text-xl text-slate-500 max-w-xl leading-relaxed mx-auto lg:mx-0">
+            <p className="text-lg sm:text-xl text-slate-500 max-w-xl leading-relaxed mx-auto lg:mx-0">
               {t('hero.subtitle')}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start px-4 sm:px-0">
               <button
                 onClick={() => navigate('/register')}
-                className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
               >
                 {t('hero.cta_start')} <ArrowUpRight size={20} />
               </button>
               <button
                 onClick={() => navigate('/plans')}
-                className="px-8 py-4 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2"
               >
                 {t('hero.cta_plans')}
               </button>
             </div>
 
-            <div className="pt-8 flex items-center justify-center lg:justify-start gap-8 border-t border-slate-100/50 mt-8">
-              <div className="text-center lg:text-left">
-                <div className="text-2xl font-bold text-slate-900">$250k+</div>
-                <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold">{t('hero.total_invested')}</div>
+            <div className="pt-8 flex items-center justify-center lg:justify-start gap-4 sm:gap-8 border-t border-slate-100/50 mt-8 overflow-x-auto pb-2 scrollbar-hide">
+              <div className="text-center lg:text-left whitespace-nowrap">
+                <div className="text-xl sm:text-2xl font-bold text-slate-900">$250k+</div>
+                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">{t('hero.total_invested')}</div>
               </div>
-              <div className="w-px h-10 bg-slate-200"></div>
-              <div className="text-center lg:text-left">
-                <div className="text-2xl font-bold text-slate-900">5k+</div>
-                <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold">{t('hero.active_users')}</div>
+              <div className="w-px h-10 bg-slate-200 shrink-0"></div>
+              <div className="text-center lg:text-left whitespace-nowrap">
+                <div className="text-xl sm:text-2xl font-bold text-slate-900">5k+</div>
+                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">{t('hero.active_users')}</div>
               </div>
-              <div className="w-px h-10 bg-slate-200"></div>
-              <div className="text-center lg:text-left">
-                <div className="text-2xl font-bold text-emerald-500">99.9%</div>
-                <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold">{t('hero.uptime')}</div>
+              <div className="w-px h-10 bg-slate-200 shrink-0"></div>
+              <div className="text-center lg:text-left whitespace-nowrap">
+                <div className="text-xl sm:text-2xl font-bold text-emerald-500">99.9%</div>
+                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">{t('hero.uptime')}</div>
               </div>
             </div>
           </div>
@@ -176,12 +176,12 @@ const HomePage = () => {
       <section className="border-y border-slate-100 bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-sm font-medium text-slate-400 mb-6 uppercase tracking-widest">{t('home.trust_text')}</p>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-            <div className="flex items-center gap-2 font-bold text-xl text-slate-800"><Hexagon size={24} className="text-orange-500" /> Bitcoin</div>
-            <div className="flex items-center gap-2 font-bold text-xl text-slate-800"><Hexagon size={24} className="text-blue-500" /> Ethereum</div>
-            <div className="flex items-center gap-2 font-bold text-xl text-slate-800"><Hexagon size={24} className="text-green-500" /> Tether</div>
-            <div className="flex items-center gap-2 font-bold text-xl text-slate-800"><Hexagon size={24} className="text-indigo-500" /> Litecoin</div>
-            <div className="flex items-center gap-2 font-bold text-xl text-slate-800"><Hexagon size={24} className="text-yellow-500" /> Binance</div>
+          <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+            <div className="flex items-center gap-2 font-bold text-lg sm:text-xl text-slate-800"><Hexagon size={20} className="text-orange-500" /> Bitcoin</div>
+            <div className="flex items-center gap-2 font-bold text-lg sm:text-xl text-slate-800"><Hexagon size={20} className="text-blue-500" /> Ethereum</div>
+            <div className="flex items-center gap-2 font-bold text-lg sm:text-xl text-slate-800"><Hexagon size={20} className="text-green-500" /> Tether</div>
+            <div className="flex items-center gap-2 font-bold text-lg sm:text-xl text-slate-800"><Hexagon size={20} className="text-indigo-500" /> Litecoin</div>
+            <div className="flex items-center gap-2 font-bold text-lg sm:text-xl text-slate-800"><Hexagon size={20} className="text-yellow-500" /> Binance</div>
           </div>
         </div>
       </section>
@@ -253,7 +253,7 @@ const HomePage = () => {
 
               <button
                 onClick={() => navigate('/register')}
-                className="mt-10 px-8 py-4 bg-white text-slate-900 rounded-xl font-bold hover:bg-emerald-50 transition-colors"
+                className="mt-10 w-full sm:w-auto px-8 py-4 bg-white text-slate-900 rounded-xl font-bold hover:bg-emerald-50 transition-colors shadow-lg shadow-black/5"
               >
                 {t('hero.cta_start')}
               </button>
@@ -329,7 +329,7 @@ const HomePage = () => {
             <p className="text-emerald-100 text-xl mb-10 max-w-2xl mx-auto">Join thousands of smart investors who are already earning daily passive income with MineFlow.</p>
             <button
               onClick={() => navigate('/register')}
-              className="bg-white text-emerald-600 px-10 py-5 rounded-xl font-bold text-xl hover:bg-emerald-50 transition-colors shadow-lg"
+              className="w-full sm:w-auto bg-white text-emerald-600 px-10 py-5 rounded-2xl font-black text-xl hover:bg-emerald-50 transition-all shadow-xl shadow-black/10 active:scale-95"
             >
               {t('hero.cta_start')}
             </button>

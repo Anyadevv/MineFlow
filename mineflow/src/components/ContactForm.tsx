@@ -40,13 +40,13 @@ export const ContactForm = () => {
     };
 
     return (
-        <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-8 md:p-12">
-            <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Mail className="text-emerald-600" size={32} />
+        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-xl border border-slate-100 p-6 sm:p-8 md:p-12">
+            <div className="text-center mb-6 sm:mb-8">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-emerald-100 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Mail className="text-emerald-600" size={window.innerWidth < 640 ? 24 : 32} />
                 </div>
-                <h2 className="text-3xl font-black text-slate-800 mb-2">Get in Touch</h2>
-                <p className="text-slate-500 font-medium">Have questions? We'd love to hear from you.</p>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-800 mb-2">Get in Touch</h2>
+                <p className="text-sm sm:text-base text-slate-500 font-medium px-4">Have questions? We'd love to hear from you.</p>
             </div>
 
             {success && (

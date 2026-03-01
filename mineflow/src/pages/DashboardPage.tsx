@@ -300,7 +300,7 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                 )}
 
                 {/* Mobile Drawer */}
-                <aside className={`fixed top-0 left-0 bottom-0 w-80 bg-white z-[100] lg:hidden shadow-2xl transition-transform duration-300 transform ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <aside className={`fixed top-0 left-0 bottom-0 w-full xs:w-80 bg-white z-[100] lg:hidden shadow-2xl transition-all duration-300 transform ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                     <div className="flex flex-col h-full">
                         <div className="p-8 border-b border-slate-50 flex justify-between items-center">
                             <div className="flex items-center gap-2">
@@ -427,9 +427,9 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-                                    <p className="text-slate-400 font-black text-[11px] tracking-[0.2em] uppercase">Deposit Balance</p>
+                                    <p className="text-slate-400 font-black text-[10px] sm:text-[11px] tracking-[0.2em] uppercase">Deposit Balance</p>
                                 </div>
-                                <h2 className="text-6xl font-black tracking-tight text-white">
+                                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white">
                                     {loading || !profile ? (
                                         <span className="animate-pulse">...</span>
                                     ) : (
@@ -449,9 +449,9 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                                    <p className="text-emerald-100/80 font-black text-[11px] tracking-[0.2em] uppercase">Earning Balance</p>
+                                    <p className="text-emerald-100/80 font-black text-[10px] sm:text-[11px] tracking-[0.2em] uppercase">Earning Balance</p>
                                 </div>
-                                <h2 className="text-6xl font-black tracking-tight text-white">
+                                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white">
                                     {loading || !profile ? (
                                         <span className="animate-pulse">...</span>
                                     ) : (
@@ -479,10 +479,10 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                 {/* Tab Content Container */}
                 <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden min-h-[500px]">
                     {activeTab === 'plans' && (
-                        <div className="p-10 space-y-10 animate-in fade-in duration-300">
+                        <div className="p-6 sm:p-10 space-y-8 sm:space-y-10 animate-in fade-in duration-300">
                             <div>
-                                <h3 className="text-3xl font-black text-slate-800 tracking-tight">INVESTMENT PLANS</h3>
-                                <p className="text-slate-400 font-bold text-sm mt-1">Choose a plan and start your mining operation instantly.</p>
+                                <h3 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">INVESTMENT PLANS</h3>
+                                <p className="text-slate-400 font-bold text-xs sm:text-sm mt-1">Choose a plan and start your mining operation instantly.</p>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {PLANS.map((plan) => (
@@ -495,12 +495,12 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                     {
                         activeTab === 'investments' && (
                             <div className="animate-in fade-in duration-300">
-                                <div className="p-10 border-b border-slate-50">
+                                <div className="p-6 sm:p-10 border-b border-slate-50">
                                     <h3 className="text-2xl font-black text-slate-800 tracking-tight">MY MINERS</h3>
                                 </div>
 
                                 {userPlans.length > 0 ? (
-                                    <div className="p-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="p-6 sm:p-10 grid grid-cols-1 md:grid-cols-2 gap-6">
                                         {userPlans.map((plan) => {
                                             const totalDays = plan.duration_days;
                                             const startDate = new Date(plan.start_date || '');
@@ -589,10 +589,12 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                     {
                         activeTab === 'transactions' && (
                             <div className="animate-in fade-in duration-300">
-                                <div className="p-10 border-b border-slate-50">
+                                <div className="p-6 sm:p-10 border-b border-slate-50">
                                     <h3 className="text-2xl font-black text-slate-800 tracking-tight">TRANSACTION HISTORY</h3>
                                 </div>
-                                <TransactionHistory transactions={transactions} />
+                                <div className="p-4 sm:p-10">
+                                    <TransactionHistory transactions={transactions} />
+                                </div>
                             </div>
                         )
                     }
