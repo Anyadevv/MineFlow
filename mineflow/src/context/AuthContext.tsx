@@ -34,11 +34,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .eq('id', targetUser.id)
                 .single();
 
-            if (error) throw error;
+            if (error) {
+                if (error.code === 'PGRST116') {
+                    console.log('Profile not found, auto-repairing...');
+                    // Attempt to auto-create missing profile
+                    const { data: newProfile, error: insertError } = await supabase
+                        .from('profiles')
+                        .insert({
+                            id: targetUser.id,
+                            email: targetUser.email,
+                            full_name: targetUser.user_metadata?.full_name || 'User',
+                            referral_code: Math.random().toString(36).substring(2, 10).toUpperCase()
+                        })
+                        .select()
+                        .single();
+                        
+                    if (!insertError && newProfile) {
+                        setProfile(newProfile);
+                        return;
+                    } else {
+                        throw insertError || new Error("Failed to create profile");
+                    }
+                }
+                throw error;
+            }
             setProfile(data);
         } catch (err) {
             console.error('Error refreshing profile:', err);
             setProfile(null);
+            // If we absolutely cannot make a profile, force sign out to prevent infinite loading
+            supabase.auth.signOut().then(() => setUser(null));
         }
     };
 
@@ -46,16 +71,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         let isInitialLoad = true;
 
         const initializeAuth = async () => {
-            // Get initial session
-            const { data: { session } } = await supabase.auth.getSession();
-            const currentUser = session?.user ?? null;
-            setUser(currentUser);
+            try {
+                // Get initial session
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) {
+                    console.error("Auth session error:", error);
+                }
+                const currentUser = session?.user ?? null;
+                setUser(currentUser);
 
-            if (currentUser) {
-                await refreshProfile(currentUser);
+                if (currentUser) {
+                    await refreshProfile(currentUser);
+                }
+            } catch (error) {
+                console.error("Failed to initialize auth:", error);
+            } finally {
+                setLoading(false);
+                isInitialLoad = false;
             }
-            setLoading(false);
-            isInitialLoad = false;
         };
 
         initializeAuth();
