@@ -27,11 +27,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return;
         }
 
+        // --- SAFETY TIMEOUT ---
+        // If the Supabase request hangs (due to network drops, corrupted local tokens, or backend stalls),
+        // we force an abort to prevent infinite loading screens.
+        const abortController = new AbortController();
+        const timeoutId = setTimeout(() => {
+            console.error('refreshProfile timed out! Forcing reset.');
+            abortController.abort();
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = '/login';
+        }, 8000);
+
         try {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', targetUser.id)
+                .abortSignal(abortController.signal)
                 .single();
 
             if (error) {
@@ -51,6 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         
                     if (!insertError && newProfile) {
                         setProfile(newProfile);
+                        clearTimeout(timeoutId);
                         return;
                     } else {
                         throw insertError || new Error("Failed to create profile");
@@ -59,15 +73,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 throw error;
             }
             setProfile(data);
-        } catch (err) {
+            clearTimeout(timeoutId);
+        } catch (err: any) {
+            clearTimeout(timeoutId);
+            if (err.name === 'AbortError') return; // We already redirected in the timeout
+
             console.error('Error refreshing profile:', err);
             setProfile(null);
-            // Aggressive fallback to prevent ghost session deadlocks (matching the Emergency Reset button fix)
+            setUser(null);
+            
+            // EMERGENCY FALLBACK: The session is corrupted. 
+            // We MUST clear and redirect instantly. Do NOT wait for signOut() to finish 
+            // because a corrupted session makes the Supabase network request hang forever.
             localStorage.clear();
-            supabase.auth.signOut().catch(console.error).finally(() => {
-                setUser(null);
-                window.location.href = '/login';
-            });
+            sessionStorage.clear();
+            
+            // Fire and forget signout
+            supabase.auth.signOut().catch(console.error);
+            
+            window.location.href = '/login';
         }
     };
 
@@ -75,6 +99,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         let isInitialLoad = true;
 
         const initializeAuth = async () => {
+            // Safety timeout to prevent infinite loading screens if Supabase client hangs
+            const timeoutId = setTimeout(() => {
+                console.error("Auth initialization timed out! Forcing reset.");
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '/login';
+            }, 8000); // 8 seconds max wait
+
             try {
                 // Get initial session
                 const { data: { session }, error } = await supabase.auth.getSession();
@@ -90,6 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } catch (error) {
                 console.error("Failed to initialize auth:", error);
             } finally {
+                clearTimeout(timeoutId);
                 setLoading(false);
                 isInitialLoad = false;
             }
