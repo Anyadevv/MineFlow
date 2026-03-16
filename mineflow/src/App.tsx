@@ -33,45 +33,14 @@ const ScrollToTop = () => {
   return null;
 };
 
-const FullPageLoader = () => {
-  const [debugForce, setDebugForce] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<string>("Loading...");
-
-  useEffect(() => {
-    // Collect local storage and session info for debugging rendering
-    const info = {
-      href: window.location.href,
-      localStorageKeys: Object.keys(localStorage),
-      hasSupabaseToken: !!localStorage.getItem('sb-jdnmrxelgixtkjiwuign-auth-token'),
-      timeElapsed: 0,
-    };
-    
-    const interval = setInterval(() => {
-      info.timeElapsed += 1;
-      setDebugInfo(JSON.stringify(info, null, 2));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (debugForce) return null; // this won't bypass the App's if(loading) return <FullPageLoader/>, but we can change App.tsx instead.
-
-  return (
-    <div className="min-h-screen bg-emerald-50/50 flex flex-col items-center justify-center relative">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-emerald-800 font-black text-sm uppercase tracking-widest">Loading MineFlow</p>
-      </div>
-      <div className="absolute bottom-4 left-4 right-4 bg-black/80 text-green-400 p-4 rounded-xl text-xs font-mono overflow-auto z-50">
-        <h3 className="text-white font-bold mb-2">DEBUG INFO: If you see this, take a screenshot!</h3>
-        <pre>{debugInfo}</pre>
-        <button onClick={() => {
-            localStorage.clear();
-            window.location.href = '/';
-        }} className="mt-4 bg-red-500 text-white px-4 py-2 rounded font-bold">EMERGENCY RESET</button>
-      </div>
+const FullPageLoader = () => (
+  <div className="min-h-screen bg-emerald-50/50 flex items-center justify-center">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-emerald-800 font-black text-sm uppercase tracking-widest">Loading MineFlow</p>
     </div>
-  );
-};
+  </div>
+);
 
 const HelpPage = () => {
   const { t } = useLanguage();
