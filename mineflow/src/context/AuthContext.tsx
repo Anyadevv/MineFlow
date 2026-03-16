@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.clear();
             sessionStorage.clear();
             window.location.href = '/login';
-        }, 8000);
+        }, 3000);
 
         try {
             const { data, error } = await supabase
@@ -50,6 +50,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (error) {
                 if (error.code === 'PGRST116') {
                     console.log('Profile not found, auto-repairing...');
+                    
+                    // --- NEW: Referral Support in Auto-Repair ---
+                    const refCode = targetUser.raw_user_meta_data?.referrer_code;
+                    let referrerId = null;
+
+                    if (refCode) {
+                        try {
+                            const { data: refData } = await supabase
+                                .from('profiles')
+                                .select('id')
+                                .eq('referral_code', refCode)
+                                .single();
+                            if (refData) referrerId = refData.id;
+                        } catch (e) {
+                            console.warn("Could not find referrer for code:", refCode);
+                        }
+                    }
+
                     // Attempt to auto-create missing profile
                     const { data: newProfile, error: insertError } = await supabase
                         .from('profiles')
@@ -57,7 +75,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             id: targetUser.id,
                             email: targetUser.email,
                             full_name: targetUser.user_metadata?.full_name || 'User',
-                            referral_code: Math.random().toString(36).substring(2, 10).toUpperCase()
+                            referral_code: Math.random().toString(36).substring(2, 10).toUpperCase(),
+                            referrer_id: referrerId // Link the referrer!
                         })
                         .select()
                         .single();
@@ -65,6 +84,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     if (!insertError && newProfile) {
                         setProfile(newProfile);
                         clearTimeout(timeoutId);
+                        
+                        // Also record the referral link in the referrals table if it exists
+                        if (referrerId) {
+                            try {
+                                await supabase.from('referrals').insert({
+                                    referrer_id: referrerId,
+                                    referred_user_id: targetUser.id,
+                                    commission_amount: 0
+                                });
+                            } catch (e) {
+                                console.error("Referral record failed:", e);
+                            }
+                        }
+
                         return;
                     } else {
                         throw insertError || new Error("Failed to create profile");
@@ -105,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 localStorage.clear();
                 sessionStorage.clear();
                 window.location.href = '/login';
-            }, 8000); // 8 seconds max wait
+            }, 3000); // 3 seconds max wait
 
             try {
                 // Get initial session
