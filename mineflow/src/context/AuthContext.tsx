@@ -91,6 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 await supabase.from('referrals').insert({
                                     referrer_id: referrerId,
                                     referred_user_id: targetUser.id,
+                                    status: 'pending',
                                     commission_amount: 0
                                 });
                             } catch (e) {

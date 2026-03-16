@@ -117,7 +117,8 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
             const { count: refCount, error: refError } = await supabase
                 .from('referrals')
                 .select('*', { count: 'exact', head: true })
-                .eq('referrer_id', user!.id);
+                .eq('referrer_id', user!.id)
+                .neq('status', 'pending');
 
             if (refError) throw refError;
             setReferralCount(refCount || 0);
