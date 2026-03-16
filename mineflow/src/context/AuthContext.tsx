@@ -63,7 +63,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.error('Error refreshing profile:', err);
             setProfile(null);
             // If we absolutely cannot make a profile, force sign out to prevent infinite loading
-            supabase.auth.signOut().then(() => setUser(null));
+            // We use finally to ENSURE setUser(null) happens even if the network request for signOut fails!
+            supabase.auth.signOut().catch(console.error).finally(() => {
+                setUser(null);
+            });
         }
     };
 
