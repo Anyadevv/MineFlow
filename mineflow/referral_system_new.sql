@@ -66,17 +66,8 @@ BEGIN
     END IF;
 
     -- 2. Validate referral code (referred_by)
-    -- Ensure the user is not referring themselves
-    IF NEW.referred_by IS NOT NULL AND NEW.referred_by = NEW.referral_code THEN
-        NEW.referred_by := NULL; -- Or raise an error, but nulling it is safer for registration flow
-    END IF;
-
-    -- 3. Ensure referred_by exists in the system
-    IF NEW.referred_by IS NOT NULL THEN
-        IF NOT EXISTS (SELECT 1 FROM public.users WHERE referral_code = NEW.referred_by) THEN
-            NEW.referred_by := NULL;
-        END IF;
-    END IF;
+    -- Security checks removed as per user request (allow self-referral and any code)
+    -- NEW.referred_by remains as provided
 
     RETURN NEW;
 END;
@@ -107,7 +98,7 @@ BEGIN
             -- Find the referrer's UUID
             SELECT id INTO v_referrer_id FROM public.users WHERE referral_code = v_referrer_code;
 
-            IF v_referrer_id IS NOT NULL AND v_referrer_id != NEW.user_id THEN
+            IF v_referrer_id IS NOT NULL THEN
                 -- Calculate reward (5% of deposit amount)
                 v_reward_amount := NEW.amount * 0.05;
 
