@@ -7,7 +7,6 @@ DROP TRIGGER IF EXISTS log_deposit_tx ON public.deposits;
 DROP TRIGGER IF EXISTS log_withdrawal_tx ON public.withdrawals;
 DROP TRIGGER IF EXISTS log_plan_tx ON public.user_plans;
 DROP TRIGGER IF EXISTS tr_on_deposit_confirmed ON public.deposits;
-DROP TRIGGER IF EXISTS tr_on_user_created ON public.users;
 
 -- Fix the malformed function (CLEAN VERSION)
 CREATE OR REPLACE FUNCTION public.handle_transaction_log()
