@@ -83,9 +83,9 @@ export const DepositDetails: React.FC<DepositDetailsProps> = ({ isOpen, onClose,
         // Instant processing
 
         try {
-            // STEP 1: Call Instant RPC
-            // This function creates the deposit and processes it instantly.
-            const { error: rpcError } = await supabase.rpc('process_instant_deposit', {
+            // STEP 1: Call Simple RPC
+            // This function handles the deposit independently for maximum stability.
+            const { error: rpcError } = await supabase.rpc('process_deposit_simple', {
                 p_amount: parseFloat(depositAmount),
                 p_coin: coin,
                 p_network: method.network,
