@@ -6,8 +6,16 @@ DROP TRIGGER IF EXISTS tr_simple_referral_reward ON public.deposits;
 DROP TRIGGER IF EXISTS log_deposit_tx ON public.deposits;
 DROP TRIGGER IF EXISTS log_withdrawal_tx ON public.withdrawals;
 DROP TRIGGER IF EXISTS log_plan_tx ON public.user_plans;
-DROP TRIGGER IF EXISTS tr_on_user_created ON public.users;
-DROP TABLE IF EXISTS public.users CASCADE;
+
+DO $$ 
+BEGIN
+    -- Only try to drop triggers/tables if the 'users' table actually exists
+    IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = 'users' AND schemaname = 'public') THEN
+        DROP TRIGGER IF EXISTS tr_on_user_created ON public.users;
+        DROP TRIGGER IF EXISTS tr_handle_user_registration ON public.users;
+        DROP TABLE public.users CASCADE;
+    END IF;
+END $$;
 
 -- 2. SCHEMA UNIFICATION: Ensure 'deposits' has all necessary columns
 ALTER TABLE public.deposits ADD COLUMN IF NOT EXISTS currency TEXT;
