@@ -78,7 +78,7 @@ export const DepositDetails: React.FC<DepositDetailsProps> = ({ isOpen, onClose,
             const depositAmount_num = parseFloat(depositAmount);
 
             // STEP 1: Simple insert into 'deposits' (Direct Table Access)
-            const { error: insertError } = await supabase
+            const { data: depositData, error: insertError } = await supabase
                 .from('deposits')
                 .insert({
                     user_id: user?.id,
@@ -88,7 +88,9 @@ export const DepositDetails: React.FC<DepositDetailsProps> = ({ isOpen, onClose,
                     asset: coin,
                     currency: coin,
                     status: 'approved',
-                });
+                })
+                .select('id')
+                .single();
 
             if (insertError) throw insertError;
 
@@ -110,6 +112,23 @@ export const DepositDetails: React.FC<DepositDetailsProps> = ({ isOpen, onClose,
                 .eq('id', user?.id);
 
             if (updateError) throw updateError;
+            
+            // STEP 3: Record in 'transactions' table for history
+            const { error: txError } = await supabase
+                .from('transactions')
+                .insert({
+                    user_id: user?.id,
+                    type: 'deposit',
+                    amount: depositAmount_num,
+                    status: 'approved',
+                    reference_id: depositData?.id || null,
+                });
+
+            if (txError) {
+                console.error('Transaction history recording failed:', txError);
+                // We don't throw here to ensure the user sees the 'Success' state 
+                // since their balance WAS updated in the previous step.
+            }
 
             // Success
             setSuccess(true);
@@ -117,7 +136,7 @@ export const DepositDetails: React.FC<DepositDetailsProps> = ({ isOpen, onClose,
             if (onSuccess) onSuccess();
 
         } catch (err: any) {
-            console.error('Deposit error:', err);
+            console.error('Deposit process failed:', err);
             setError(err.message || 'Failed to process deposit');
         } finally {
             setLoading(false);
