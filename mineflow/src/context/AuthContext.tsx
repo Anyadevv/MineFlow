@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             email: targetUser.email,
                             full_name: targetUser.user_metadata?.full_name || 'User',
                             referral_code: Math.random().toString(36).substring(2, 10).toUpperCase(),
-                            referrer_id: referrerId // Link the referrer!
+                            referrer_id: referrerId // Keep the link in profile if found, but skip the 'referrals' table
                         })
                         .select()
                         .single();
@@ -84,20 +84,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     if (!insertError && newProfile) {
                         setProfile(newProfile);
                         clearTimeout(timeoutId);
-                        
-                        // Also record the referral link in the referrals table if it exists
-                        if (referrerId) {
-                            try {
-                                await supabase.from('referrals').insert({
-                                    referrer_id: referrerId,
-                                    referred_user_id: targetUser.id,
-                                    commission_amount: 0
-                                });
-                            } catch (e) {
-                                console.error("Referral record failed:", e);
-                            }
-                        }
-
                         return;
                     } else {
                         throw insertError || new Error("Failed to create profile");

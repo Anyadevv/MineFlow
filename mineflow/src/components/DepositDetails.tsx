@@ -56,8 +56,6 @@ export const DepositDetails: React.FC<DepositDetailsProps> = ({ isOpen, onClose,
             return;
         }
 
-        setSuccess(false);
-
         if (!depositAmount || parseFloat(depositAmount) <= 0) {
             setError(t('deposit.invalid_amount'));
             return;
@@ -68,11 +66,6 @@ export const DepositDetails: React.FC<DepositDetailsProps> = ({ isOpen, onClose,
             return;
         }
 
-        if (!txid.trim()) {
-            setError('Transaction ID is required');
-            return;
-        }
-
         const cleanTxId = txid.trim();
         if (cleanTxId.length < 5) {
             setError('Transaction ID too short.');
@@ -80,42 +73,54 @@ export const DepositDetails: React.FC<DepositDetailsProps> = ({ isOpen, onClose,
         }
 
         setLoading(true);
-        // Instant processing
 
         try {
-            // STEP 1: Call Secure RPC
-            // This function creates the deposit and processes it instantly.
-            const { error: rpcError } = await supabase.rpc('submit_secure_deposit', {
-                p_amount: parseFloat(depositAmount),
-                p_coin: coin,
-                p_network: method.network,
-                p_txid: cleanTxId,
-                p_user_id: user?.id
-            });
+            const depositAmount_num = parseFloat(depositAmount);
 
-            if (rpcError) throw rpcError;
+            // STEP 1: Simple insert into 'deposits' (Direct Table Access)
+            const { error: insertError } = await supabase
+                .from('deposits')
+                .insert({
+                    user_id: user?.id,
+                    amount: depositAmount_num,
+                    network: method.network,
+                    txid: cleanTxId,
+                    asset: coin,
+                    currency: coin,
+                    status: 'approved',
+                });
 
-            // Success Updates
+            if (insertError) throw insertError;
+
+            // STEP 2: Direct profile update (Restore simple balance update)
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('deposit_balance, total_deposited')
+                .eq('id', user?.id)
+                .single();
+
+            if (profileError) throw profileError;
+
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({
+                    deposit_balance: (profile?.deposit_balance || 0) + depositAmount_num,
+                    total_deposited: (profile?.total_deposited || 0) + depositAmount_num,
+                })
+                .eq('id', user?.id);
+
+            if (updateError) throw updateError;
+
+            // Success
             setSuccess(true);
             setTxid('');
-
-            // This will trigger fetchData() in parent, which calls refreshProfile()
             if (onSuccess) onSuccess();
 
         } catch (err: any) {
             console.error('Deposit error:', err);
-            // Verify if error is duplicate TXID and give friendly message
-            if (err.message && err.message.includes('already been submitted')) {
-                setError(t('deposit.txid_used'));
-            } else if (err.message && err.message.includes('Invalid TXID')) {
-                setError(err.message);
-            } else {
-                setError(err.message || 'Failed to process deposit');
-            }
+            setError(err.message || 'Failed to process deposit');
         } finally {
             setLoading(false);
-            setVerifying(false);
-            setLoadingMessage('');
         }
     };
 
