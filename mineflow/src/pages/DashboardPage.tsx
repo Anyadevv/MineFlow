@@ -117,8 +117,7 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
             const { count: refCount, error: refError } = await supabase
                 .from('referrals')
                 .select('*', { count: 'exact', head: true })
-                .eq('referrer_id', user!.id)
-                .neq('status', 'pending');
+                .eq('referrer_id', user!.id);
 
             if (refError) throw refError;
             setReferralCount(refCount || 0);
@@ -623,6 +622,13 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                                             </button>
                                         </div>
                                     </div>
+                                </div>
+                                <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-2xl px-5 py-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="shrink-0 mt-0.5 text-amber-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                    <p className="text-xs font-bold text-amber-700">
+                                        <span className="uppercase tracking-widest text-amber-500 block mb-0.5">Note</span>
+                                        Referrals are validated within 24 hours after the referred user registers and makes their first deposit.
+                                    </p>
                                 </div>
                             </div>
                         )

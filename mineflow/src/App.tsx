@@ -17,23 +17,11 @@ import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-
 import { supabase } from './lib/supabase';
 import './miner-animations.css';
 
-// Helper to force a hard reload if a chunk fails to load (common Vercel deployment caching issue)
-const lazyWithReload = (componentImport: () => Promise<any>) =>
-  React.lazy(async () => {
-    try {
-      return await componentImport();
-    } catch (error) {
-      console.error("Chunk loading failed, forcing reload...", error);
-      window.location.reload();
-      return { default: () => <FullPageLoader /> };
-    }
-  });
-
 // Lazy load heavy components
-const AuthPage = lazyWithReload(() => import('./pages/AuthPage').then(module => ({ default: module.AuthPage })));
-const DashboardPage = lazyWithReload(() => import('./pages/DashboardPage').then(module => ({ default: module.DashboardPage })));
-const AdminDashboardPage = lazyWithReload(() => import('./pages/AdminDashboardPage').then(module => ({ default: module.AdminDashboardPage })));
-const WalletSettingsPage = lazyWithReload(() => import('./pages/WalletSettingsPage').then(module => ({ default: module.WalletSettingsPage })));
+const AuthPage = React.lazy(() => import('./pages/AuthPage').then(module => ({ default: module.AuthPage })));
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage').then(module => ({ default: module.DashboardPage })));
+const AdminDashboardPage = React.lazy(() => import('./pages/AdminDashboardPage').then(module => ({ default: module.AdminDashboardPage })));
+const WalletSettingsPage = React.lazy(() => import('./pages/WalletSettingsPage').then(module => ({ default: module.WalletSettingsPage })));
 
 // --- Page Components ---
 

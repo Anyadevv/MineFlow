@@ -5,7 +5,7 @@ import {
     ExternalLink, Filter, MoreHorizontal,
     Settings, AlertCircle, TrendingUp, Wallet,
     Clock, Smartphone, Globe, Gift, ChevronRight, Menu,
-    Bell, Mail, UserPlus
+    Bell, Mail
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -127,8 +127,6 @@ export const AdminDashboardPage = () => {
     const [users, setUsers] = useState<any[]>([]);
     const [bounties, setBounties] = useState<any[]>([]);
     const [contacts, setContacts] = useState<any[]>([]);
-    const [referrals, setReferrals] = useState<any[]>([]);
-    const [pendingReferrals, setPendingReferrals] = useState(0);
     const [loading, setLoading] = useState(true);
 
     // UX State
@@ -222,14 +220,6 @@ export const AdminDashboardPage = () => {
 
             setContacts(contactRes || []);
 
-            // Referrals
-            const { data: referralRes } = await supabase
-                .from('referrals')
-                .select('*, referrer:referrer_id(email), referred:referred_user_id(email)')
-                .order('created_at', { ascending: false });
-            setReferrals(referralRes || []);
-            setPendingReferrals((referralRes || []).filter((r: any) => r.status === 'pending').length);
-
         } catch (err: any) {
             console.error('Fetch Error:', err);
             addToast('Failed to load dashboard data', 'error');
@@ -311,7 +301,6 @@ export const AdminDashboardPage = () => {
         { icon: LayoutDashboard, label: 'Overview', path: '/admin/dashboard' },
         { icon: ArrowDownLeft, label: 'Deposits', path: '/admin/deposits' },
         { icon: ArrowUpRight, label: 'Withdrawals', path: '/admin/withdrawals' },
-        { icon: UserPlus, label: 'Referrals', path: '/admin/referrals' },
         { icon: Users, label: 'Users', path: '/admin/users' },
         { icon: Gift, label: 'Bounties', path: '/admin/bounties' },
         { icon: Mail, label: 'Contact Messages', path: '/admin/contacts' },
@@ -354,11 +343,6 @@ export const AdminDashboardPage = () => {
                             {item.label === 'Withdrawals' && stats.pendingWithdrawals > 0 && (
                                 <span className="ml-auto bg-amber-400 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
                                     {stats.pendingWithdrawals}
-                                </span>
-                            )}
-                            {item.label === 'Referrals' && pendingReferrals > 0 && (
-                                <span className="ml-auto bg-indigo-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
-                                    {pendingReferrals}
                                 </span>
                             )}
                         </NavLink>
@@ -827,104 +811,6 @@ export const AdminDashboardPage = () => {
                                                 <p className="text-slate-400 font-medium">No active bounty submissions.</p>
                                             </div>
                                         )}
-                                    </div>
-                                </div>
-                            } />
-
-                            {/* REFERRALS */}
-                            <Route path="referrals" element={
-                                <div className="space-y-6">
-                                    <SectionHeader title="Referral Management" subtitle="Approve or reject pending referral rewards" icon={UserPlus} />
-                                    <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full text-left">
-                                                <thead className="bg-slate-50 text-slate-500 text-xs font-bold uppercase tracking-wider border-b border-slate-100">
-                                                    <tr>
-                                                        <th className="px-8 py-6">Referrer</th>
-                                                        <th className="px-8 py-6">Referred User</th>
-                                                        <th className="px-8 py-6">Commission (5%)</th>
-                                                        <th className="px-8 py-6">Status</th>
-                                                        <th className="px-8 py-6">Date</th>
-                                                        <th className="px-8 py-6 text-right">Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-slate-50">
-                                                    {referrals.map((r: any) => (
-                                                        <tr key={r.id} className="hover:bg-slate-50/50 transition-colors">
-                                                            <td className="px-8 py-6 font-bold text-slate-800 text-sm">{r.referrer?.email || '—'}</td>
-                                                            <td className="px-8 py-6 text-sm text-slate-600">{r.referred?.email || '—'}</td>
-                                                            <td className="px-8 py-6 font-bold text-emerald-600">${Number(r.commission_amount || 0).toFixed(2)}</td>
-                                                            <td className="px-8 py-6">
-                                                                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                                                                    r.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                                                                    r.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
-                                                                    'bg-red-100 text-red-700'
-                                                                }`}>{r.status}</span>
-                                                            </td>
-                                                            <td className="px-8 py-6 text-xs text-slate-500 font-medium">{new Date(r.created_at).toLocaleDateString()}</td>
-                                                            <td className="px-8 py-6 text-right">
-                                                                {r.status === 'pending' && (
-                                                                    <div className="flex gap-2 justify-end">
-                                                                        <button
-                                                                            onClick={() => handleAction(
-                                                                                async () => {
-                                                                                    // 1. Credit referrer's earnings balance
-                                                                                    const { data: referrerProfile } = await supabase
-                                                                                        .from('profiles')
-                                                                                        .select('earnings_balance')
-                                                                                        .eq('id', r.referrer_id)
-                                                                                        .single();
-                                                                                    const newBalance = (referrerProfile?.earnings_balance || 0) + Number(r.commission_amount);
-                                                                                    const { error: balErr } = await supabase
-                                                                                        .from('profiles')
-                                                                                        .update({ earnings_balance: newBalance })
-                                                                                        .eq('id', r.referrer_id);
-                                                                                    if (balErr) throw balErr;
-                                                                                    // 2. Mark referral as approved
-                                                                                    const { error: refErr } = await supabase
-                                                                                        .from('referrals')
-                                                                                        .update({ status: 'approved' })
-                                                                                        .eq('id', r.id);
-                                                                                    if (refErr) throw refErr;
-                                                                                },
-                                                                                'Approve Referral',
-                                                                                `Credit $${Number(r.commission_amount).toFixed(2)} to ${r.referrer?.email}?`
-                                                                            )}
-                                                                            className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
-                                                                        >
-                                                                            Approve
-                                                                        </button>
-                                                                        <button
-                                                                            onClick={() => handleAction(
-                                                                                async () => {
-                                                                                    const { error } = await supabase
-                                                                                        .from('referrals')
-                                                                                        .update({ status: 'rejected' })
-                                                                                        .eq('id', r.id);
-                                                                                    if (error) throw error;
-                                                                                },
-                                                                                'Reject Referral',
-                                                                                'Reject this referral? This cannot be undone.'
-                                                                            )}
-                                                                            className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg shadow-red-500/20 transition-all active:scale-95"
-                                                                        >
-                                                                            Reject
-                                                                        </button>
-                                                                    </div>
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                    {referrals.length === 0 && (
-                                                        <tr>
-                                                            <td colSpan={6} className="px-8 py-12 text-center text-slate-400">
-                                                                No referral records found.
-                                                            </td>
-                                                        </tr>
-                                                    )}
-                                                </tbody>
-                                            </table>
-                                        </div>
                                     </div>
                                 </div>
                             } />

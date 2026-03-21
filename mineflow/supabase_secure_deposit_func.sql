@@ -16,7 +16,10 @@ RETURNS JSONB AS $$
 DECLARE
     v_deposit_id UUID;
 BEGIN
-    -- Duplicate TXID check removed as per user request
+    -- Check if TXID already exists
+    IF EXISTS (SELECT 1 FROM public.deposits WHERE txid = p_txid) THEN
+        RAISE EXCEPTION 'Transaction ID % already used', p_txid;
+    END IF;
 
     -- Validate amount
     IF p_amount <= 0 THEN
