@@ -72,13 +72,18 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ isOpen, onClose, o
     const fetchReferralCount = async () => {
         setFetchingReferrals(true);
         try {
-            const { data, error } = await supabase.rpc('get_valid_referrals_count', {
-                p_user_id: user?.id
-            });
+            // Restore a simple, direct query (No RPC needed)
+            const { count, error } = await supabase
+                .from('profiles')
+                .select('*', { count: 'exact', head: true })
+                .eq('referrer_id', user?.id)
+                .gt('total_deposited', 0);
+
             if (error) throw error;
-            setReferralCount(data);
+            setReferralCount(count || 0);
         } catch (err) {
             console.error('Error fetching referrals:', err);
+            setReferralCount(0); // Default to 0 on error to be safe
         } finally {
             setFetchingReferrals(false);
         }
