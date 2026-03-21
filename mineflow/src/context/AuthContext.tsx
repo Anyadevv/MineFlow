@@ -87,16 +87,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         
                         // Also record the referral link in the referrals table if it exists
                         if (referrerId) {
-                            try {
-                                await supabase.from('referrals').insert({
-                                    referrer_id: referrerId,
-                                    referred_user_id: targetUser.id,
-                                    status: 'pending',
-                                    commission_amount: 0
-                                });
-                            } catch (e) {
-                                console.error("Referral record failed:", e);
-                            }
+                            // Best-effort insert — never blocks profile creation
+                            supabase.from('referrals').insert({
+                                referrer_id: referrerId,
+                                referred_user_id: targetUser.id,
+                                status: 'pending',
+                                commission_amount: 0
+                            }).then(({ error }) => {
+                                if (error) console.warn("Referral log failed (non-critical):", error.message);
+                            });
                         }
 
                         return;
