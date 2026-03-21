@@ -27,18 +27,104 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return;
         }
 
+        // --- SAFETY TIMEOUT ---
+        // If the Supabase request hangs (due to network drops, corrupted local tokens, or backend stalls),
+        // we force an abort to prevent infinite loading screens.
+        const abortController = new AbortController();
+        const timeoutId = setTimeout(() => {
+            console.error('refreshProfile timed out! Forcing reset.');
+            abortController.abort();
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = '/login';
+        }, 3000);
+
         try {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', targetUser.id)
+                .abortSignal(abortController.signal)
                 .single();
 
-            if (error) throw error;
+            if (error) {
+                if (error.code === 'PGRST116') {
+                    console.log('Profile not found, auto-repairing...');
+                    
+                    // --- NEW: Referral Support in Auto-Repair ---
+                    const refCode = targetUser.raw_user_meta_data?.referrer_code;
+                    let referrerId = null;
+
+                    if (refCode) {
+                        try {
+                            const { data: refData } = await supabase
+                                .from('profiles')
+                                .select('id')
+                                .eq('referral_code', refCode)
+                                .single();
+                            if (refData) referrerId = refData.id;
+                        } catch (e) {
+                            console.warn("Could not find referrer for code:", refCode);
+                        }
+                    }
+
+                    // Attempt to auto-create missing profile
+                    const { data: newProfile, error: insertError } = await supabase
+                        .from('profiles')
+                        .insert({
+                            id: targetUser.id,
+                            email: targetUser.email,
+                            full_name: targetUser.user_metadata?.full_name || 'User',
+                            referral_code: Math.random().toString(36).substring(2, 10).toUpperCase(),
+                            referrer_id: referrerId // Link the referrer!
+                        })
+                        .select()
+                        .single();
+                        
+                    if (!insertError && newProfile) {
+                        setProfile(newProfile);
+                        clearTimeout(timeoutId);
+                        
+                        // Also record the referral link in the referrals table if it exists
+                        if (referrerId) {
+                            try {
+                                await supabase.from('referrals').insert({
+                                    referrer_id: referrerId,
+                                    referred_user_id: targetUser.id,
+                                    commission_amount: 0
+                                });
+                            } catch (e) {
+                                console.error("Referral record failed:", e);
+                            }
+                        }
+
+                        return;
+                    } else {
+                        throw insertError || new Error("Failed to create profile");
+                    }
+                }
+                throw error;
+            }
             setProfile(data);
-        } catch (err) {
+            clearTimeout(timeoutId);
+        } catch (err: any) {
+            clearTimeout(timeoutId);
+            if (err.name === 'AbortError') return; // We already redirected in the timeout
+
             console.error('Error refreshing profile:', err);
             setProfile(null);
+            setUser(null);
+            
+            // EMERGENCY FALLBACK: The session is corrupted. 
+            // We MUST clear and redirect instantly. Do NOT wait for signOut() to finish 
+            // because a corrupted session makes the Supabase network request hang forever.
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Fire and forget signout
+            supabase.auth.signOut().catch(console.error);
+            
+            window.location.href = '/login';
         }
     };
 
@@ -46,16 +132,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         let isInitialLoad = true;
 
         const initializeAuth = async () => {
-            // Get initial session
-            const { data: { session } } = await supabase.auth.getSession();
-            const currentUser = session?.user ?? null;
-            setUser(currentUser);
+            // Safety timeout to prevent infinite loading screens if Supabase client hangs
+            const timeoutId = setTimeout(() => {
+                console.error("Auth initialization timed out! Forcing reset.");
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '/login';
+            }, 3000); // 3 seconds max wait
 
-            if (currentUser) {
-                await refreshProfile(currentUser);
+            try {
+                // Get initial session
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) {
+                    console.error("Auth session error:", error);
+                }
+                const currentUser = session?.user ?? null;
+                setUser(currentUser);
+
+                if (currentUser) {
+                    await refreshProfile(currentUser);
+                }
+            } catch (error) {
+                console.error("Failed to initialize auth:", error);
+            } finally {
+                clearTimeout(timeoutId);
+                setLoading(false);
+                isInitialLoad = false;
             }
-            setLoading(false);
-            isInitialLoad = false;
         };
 
         initializeAuth();
