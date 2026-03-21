@@ -622,6 +622,9 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                                                 {refCopied ? 'COPIED!' : 'COPY'}
                                             </button>
                                         </div>
+                                        <p className="text-[11px] font-bold text-emerald-600/70 italic px-2">
+                                            {t('dashboard.referral_note')}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
