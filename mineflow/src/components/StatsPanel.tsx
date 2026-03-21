@@ -28,7 +28,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({
             {stats.map((stat, i) => (
                 <div key={i} className="bg-white p-5 sm:p-7 rounded-[2rem] sm:rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-4 sm:gap-5 transition-all hover:shadow-md group">
                     <div className={`${stat.bg} w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-[1.25rem] flex items-center justify-center group-hover:scale-110 transition-transform shrink-0`}>
-                        {React.cloneElement(stat.icon as React.ReactElement, { size: window.innerWidth < 640 ? 20 : 24 })}
+                        {stat.icon}
                     </div>
                     <div>
                         <p className="text-slate-400 font-bold text-[9px] sm:text-[11px] tracking-widest uppercase">{stat.label}</p>

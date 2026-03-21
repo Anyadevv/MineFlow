@@ -295,13 +295,13 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                 {/* Drawer Overlay */}
                 {isMobileSidebarOpen && (
                     <div
-                        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] lg:hidden animate-in fade-in duration-300"
+                        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] lg:hidden"
                         onClick={() => setIsMobileSidebarOpen(false)}
                     />
                 )}
 
                 {/* Mobile Drawer */}
-                <aside className={`fixed top-0 left-0 bottom-0 w-full xs:w-80 bg-white z-[100] lg:hidden shadow-2xl transition-all duration-300 transform ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <aside className={`fixed top-0 left-0 bottom-0 w-full xs:w-80 bg-white z-[100] lg:hidden shadow-2xl transition-all transform ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                     <div className="flex flex-col h-full">
                         <div className="p-8 border-b border-slate-50 flex justify-between items-center">
                             <div className="flex items-center gap-2">
@@ -396,23 +396,23 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                 </aside>
 
                 {/* Mobile/Desktop Header for User Info */}
-                <div className="flex justify-between items-center lg:hidden">
-                    <div className="flex items-center gap-4">
+                <div className="flex justify-between items-center lg:hidden bg-white/80 backdrop-blur-md sticky top-[80px] z-[90] -mx-8 sm:-mx-12 px-6 py-4 border-b border-slate-100 mb-6">
+                    <div className="flex items-center gap-3">
                         <button
                             onClick={() => setIsMobileSidebarOpen(true)}
                             className="p-2 -ml-2 text-slate-600 hover:bg-emerald-50 rounded-xl transition-colors"
                         >
-                            <Menu size={28} />
+                            <Menu size={24} />
                         </button>
                         <div className="flex items-center gap-2">
-                            <div className="bg-emerald-500 p-2 rounded-lg">
-                                <TrendingUp size={20} className="text-white" />
+                            <div className="bg-emerald-500 p-1.5 rounded-lg">
+                                <TrendingUp size={18} className="text-white" />
                             </div>
-                            <span className="font-bold text-slate-800">MineFlow</span>
+                            <span className="font-bold text-slate-800 text-lg">MineFlow</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-slate-500 truncate max-w-[120px]">{profile?.email}</span>
+                        <span className="hidden xs:block text-xs font-bold text-slate-400 truncate max-w-[120px]">{profile?.email}</span>
                         <button onClick={() => signOut()} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><LogOut size={20} /></button>
                     </div>
                 </div>
@@ -422,15 +422,15 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                 {/* Balance & Stats Cards */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Deposit Card */}
-                    <div className="relative overflow-hidden p-10 rounded-[2.5rem] bg-slate-900 text-white shadow-2xl shadow-slate-900/20 transition-all hover:scale-[1.01] hover:shadow-slate-900/30 group">
+                    <div className="relative overflow-hidden p-6 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] bg-slate-900 text-white shadow-2xl shadow-slate-900/20 transition-all hover:scale-[1.01] hover:shadow-slate-900/30 group">
                         <div className="absolute right-[-5%] top-[-5%] opacity-10 group-hover:opacity-15 transition-opacity"><Wallet size={160} /></div>
-                        <div className="relative z-10 space-y-8">
+                        <div className="relative z-10 space-y-6 sm:space-y-8">
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-                                    <p className="text-slate-400 font-black text-[10px] sm:text-[11px] tracking-[0.2em] uppercase">Deposit Balance</p>
+                                    <p className="text-slate-400 font-black text-[9px] sm:text-[11px] tracking-[0.2em] uppercase">Deposit Balance</p>
                                 </div>
-                                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white">
+                                <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white">
                                     {loading || !profile ? (
                                         <span className="animate-pulse">...</span>
                                     ) : (
@@ -444,15 +444,15 @@ export const DashboardPage = ({ onNavigate }: { onNavigate: (page: string) => vo
                         </div>
                     </div>
                     {/* Earning Card */}
-                    <div className="relative overflow-hidden p-10 rounded-[2.5rem] bg-gradient-to-br from-emerald-600 to-teal-500 text-white shadow-2xl shadow-emerald-500/20 transition-all hover:scale-[1.01] hover:shadow-emerald-500/30 group">
+                    <div className="relative overflow-hidden p-6 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-br from-emerald-600 to-teal-500 text-white shadow-2xl shadow-emerald-500/20 transition-all hover:scale-[1.01] hover:shadow-emerald-500/30 group">
                         <div className="absolute right-[-5%] top-[-5%] opacity-10 group-hover:opacity-15 transition-opacity"><TrendingUp size={160} /></div>
-                        <div className="relative z-10 space-y-8">
+                        <div className="relative z-10 space-y-6 sm:space-y-8">
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                                    <p className="text-emerald-100/80 font-black text-[10px] sm:text-[11px] tracking-[0.2em] uppercase">Earning Balance</p>
+                                    <p className="text-emerald-100/80 font-black text-[9px] sm:text-[11px] tracking-[0.2em] uppercase">Earning Balance</p>
                                 </div>
-                                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white">
+                                <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white">
                                     {loading || !profile ? (
                                         <span className="animate-pulse">...</span>
                                     ) : (

@@ -20,7 +20,7 @@ export const LanguageSwitcher: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed bottom-6 left-6 z-50" ref={dropdownRef}>
+    <div className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-[100]" ref={dropdownRef}>
       {isOpen && (
         <div className="absolute bottom-full left-0 mb-3 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden min-w-[180px] animate-in slide-in-from-bottom-2 fade-in duration-200">
           <div className="py-2 max-h-[300px] overflow-y-auto">

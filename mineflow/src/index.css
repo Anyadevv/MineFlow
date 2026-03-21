@@ -53,6 +53,58 @@
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);
   }
+
+  /* Missing animate-in definitions */
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes zoom-in-95 {
+    from { transform: scale(0.95); }
+    to { transform: scale(1); }
+  }
+  @keyframes slide-in-from-top-2 {
+    from { transform: translateY(-0.5rem); }
+    to { transform: translateY(0); }
+  }
+  @keyframes slide-in-from-left-4 {
+    from { transform: translateX(-1rem); }
+    to { transform: translateX(0); }
+  }
+  @keyframes slide-in-from-right-4 {
+    from { transform: translateX(1rem); }
+    to { transform: translateX(0); }
+  }
+  @keyframes slide-in-from-bottom-4 {
+    from { transform: translateY(1rem); }
+    to { transform: translateY(0); }
+  }
+  @keyframes slide-in-from-bottom-8 {
+    from { transform: translateY(2rem); }
+    to { transform: translateY(0); }
+  }
+
+  .animate-in {
+    animation-duration: 300ms;
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .fade-in { animation-name: fade-in; }
+  .zoom-in-95 { animation-name: zoom-in-95; }
+  .slide-in-from-top-2 { animation-name: slide-in-from-top-2; }
+  .slide-in-from-left-4 { animation-name: slide-in-from-left-4; }
+  .slide-in-from-right-4 { animation-name: slide-in-from-right-4; }
+  .slide-in-from-bottom-4 { animation-name: slide-in-from-bottom-4; }
+  .slide-in-from-bottom-8 { animation-name: slide-in-from-bottom-8; }
+
+  /* Combined animations for common use cases */
+  .animate-in.fade-in.slide-in-from-top-2 { animation-name: fade-in, slide-in-from-top-2; }
+  .animate-in.fade-in.zoom-in-95 { animation-name: fade-in, zoom-in-95; }
+  .animate-in.fade-in.slide-in-from-left-4 { animation-name: fade-in, slide-in-from-left-4; }
+  .animate-in.fade-in.slide-in-from-right-4 { animation-name: fade-in, slide-in-from-right-4; }
+  .animate-in.fade-in.slide-in-from-bottom-4 { animation-name: fade-in, slide-in-from-bottom-4; }
+  .animate-in.fade-in.slide-in-from-bottom-8 { animation-name: fade-in, slide-in-from-bottom-8; }
 }
 
 :root { --color-primary: #10b981; --color-secondary: #0f172a; }

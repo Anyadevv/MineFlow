@@ -39,7 +39,7 @@ export const UserMenu = ({ onNavigate }: { onNavigate: (page: string) => void })
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 z-50">
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-[100]">
                     <div className="p-4 border-b border-slate-50 bg-slate-50/50">
                         <p className="text-xs font-bold text-slate-500">My Account</p>
                         <p className="text-sm font-black text-slate-800 truncate">{profile?.email}</p>

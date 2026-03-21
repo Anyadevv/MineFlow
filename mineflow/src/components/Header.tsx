@@ -35,7 +35,7 @@ export const Header: React.FC<HeaderProps> = ({ isAuthenticated, onLogout, user,
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
+    <header className="sticky top-0 z-[100] bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
@@ -110,9 +110,12 @@ export const Header: React.FC<HeaderProps> = ({ isAuthenticated, onLogout, user,
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-20 z-50 bg-white animate-in slide-in-from-top-2 overflow-y-auto">
+        <div 
+          className="md:hidden fixed left-0 right-0 bottom-0 top-[80px] z-[9999] bg-white overflow-y-auto"
+          style={{ display: 'block', opacity: 1, visibility: 'visible' }}
+        >
           <div className="px-6 py-8 space-y-4">
             {navItems.map((item) => (
               <button
