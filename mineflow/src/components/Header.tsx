@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Menu, X, Hexagon, User as UserIcon } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 import { Database } from '../lib/database.types';
@@ -110,60 +111,87 @@ export const Header: React.FC<HeaderProps> = ({ isAuthenticated, onLogout, user,
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
+      {/* Mobile Menu Overlay using Portal to body */}
+      {isMobileMenuOpen && typeof document !== 'undefined' && createPortal(
         <div 
-          className="md:hidden fixed left-0 right-0 bottom-0 top-[80px] z-[9999] bg-white overflow-y-auto"
-          style={{ display: 'block', opacity: 1, visibility: 'visible' }}
+          className="fixed inset-0 z-[10000] lg:hidden"
+          style={{ pointerEvents: 'auto' }}
         >
-          <div className="px-6 py-8 space-y-4">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`block w-full text-left px-6 py-4 rounded-2xl text-lg font-bold transition-all ${location.pathname === item.id 
-                  ? 'bg-emerald-50 text-emerald-600' 
-                  : 'text-slate-600 hover:bg-slate-50'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-            <div className="border-t border-slate-100 my-6 pt-6 space-y-4">
-              {isAuthenticated ? (
-                <>
-                  <button
-                    onClick={() => handleNavClick('/dashboard')}
-                    className="block w-full text-center px-6 py-4 rounded-2xl text-lg font-black bg-emerald-50 text-emerald-600 border border-emerald-500/20 shadow-sm"
-                  >
-                    My Earnings
-                  </button>
-                  <button
-                    onClick={onLogout}
-                    className="block w-full text-center px-6 py-4 rounded-2xl text-lg font-bold text-slate-400 uppercase tracking-widest"
-                  >
-                    Log Out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => handleNavClick('/login')}
-                    className="block w-full text-center px-6 py-4 rounded-2xl text-lg font-bold text-slate-500 border border-slate-100"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('/register')}
-                    className="block w-full text-center px-6 py-4 rounded-2xl text-lg font-black bg-[#10b981] text-white shadow-lg shadow-emerald-500/20"
-                  >
-                    Get Started
-                  </button>
-                </>
-              )}
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          
+          {/* Sidebar Content */}
+          <div 
+            className="absolute right-0 top-0 bottom-0 w-[280px] bg-white shadow-2xl flex flex-col pt-20"
+            style={{ 
+              display: 'flex',
+              flexDirection: 'column',
+              backgroundColor: 'white',
+              boxShadow: '-10px 0 25px rgba(0,0,0,0.1)'
+            }}
+          >
+            <div className="flex-grow px-6 py-8 space-y-2 overflow-y-auto">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`block w-full text-left px-5 py-4 rounded-xl text-base font-bold transition-all ${location.pathname === item.id 
+                    ? 'bg-emerald-50 text-emerald-600' 
+                    : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+              
+              <div className="border-t border-slate-100 mt-6 pt-6 space-y-3">
+                {isAuthenticated ? (
+                  <>
+                    <button
+                      onClick={() => handleNavClick('/dashboard')}
+                      className="block w-full text-center px-6 py-4 rounded-xl text-base font-black bg-emerald-50 text-emerald-600 border border-emerald-500/20 shadow-sm"
+                    >
+                      My Earnings
+                    </button>
+                    <button
+                      onClick={onLogout}
+                      className="block w-full text-center px-6 py-4 rounded-xl text-sm font-bold text-slate-400 uppercase tracking-widest"
+                    >
+                      Log Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => handleNavClick('/login')}
+                      className="block w-full text-center px-6 py-4 rounded-xl text-base font-bold text-slate-500 border border-slate-100"
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('/register')}
+                      className="block w-full text-center px-6 py-4 rounded-xl text-base font-black bg-[#10b981] text-white shadow-lg shadow-emerald-500/20"
+                    >
+                      Get Started
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
+
+            {/* Close button inside sidebar for clearer UX */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-600"
+            >
+              <X size={24} />
+            </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );
